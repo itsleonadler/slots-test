@@ -1,5 +1,5 @@
 "use client"
-import { SymbolKey } from "@/types/game"
+import { SymbolKey } from "@/lib/shared/types"
 
 export default function SlotReel({
   value,

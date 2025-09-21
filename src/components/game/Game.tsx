@@ -4,7 +4,7 @@
 import SlotMachine from './SlotMachine';
 import CreditsBadge from './CreditsBadge';
 import Controls from './Controls';
-import { SymbolKey, Status } from '@/types/game';
+import { SymbolKey, Status } from '@/lib/shared/types';
 import { useGameStore } from '@/stores/gameStore';
 import { useEffect } from 'react';
 

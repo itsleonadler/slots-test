@@ -7,7 +7,7 @@ import {
   type RollResult,
   Status,
   RevealedFlags,
-} from "@/types/game"
+} from "@/lib/shared/types"
 import { slotGameService } from "@/lib/api/SlotGameService"
 
 type GameState = {
