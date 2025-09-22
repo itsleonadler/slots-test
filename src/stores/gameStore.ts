@@ -4,7 +4,7 @@ import { create } from "zustand"
 import {
   SymbolKey,
   type SymbolsTriple,
-  type RollResult,
+  type RollResponse,
   Status,
   RevealedFlags,
 } from "@/lib/shared/types"
@@ -18,6 +18,8 @@ type GameState = {
   canSpin: boolean
   error?: string
   timers: number[]
+  balance: number
+  lastCashoutAmount?: number
 }
 
 type GameActions = {
@@ -26,6 +28,7 @@ type GameActions = {
   cashout: () => Promise<void>
   clearTimers: () => void
   resetError: () => void
+  startNewSession: () => Promise<void>
 }
 
 export const useGameStore = create<GameState & GameActions>((set, get) => ({
@@ -33,6 +36,7 @@ export const useGameStore = create<GameState & GameActions>((set, get) => ({
   reels: [SymbolKey.C, SymbolKey.L, SymbolKey.O],
   revealed: [true, true, true],
   credits: 0,
+  balance: 0,
   canSpin: false,
   error: undefined,
   timers: [],
@@ -43,6 +47,7 @@ export const useGameStore = create<GameState & GameActions>((set, get) => ({
       set(
         {
           credits: s.credits,
+          balance: s.accountBalance,
           status: Status.Idle,
           canSpin: true,
           error: undefined,
@@ -57,9 +62,24 @@ export const useGameStore = create<GameState & GameActions>((set, get) => ({
     }
   },
 
+  async startNewSession() {
+    get().clearTimers()
+    set({
+      status: Status.Idle,
+      revealed: [true, true, true],
+      lastCashoutAmount: undefined,
+    })
+    await get().initSession()
+  },
+
   async spin() {
-    const { canSpin, status } = get()
+    const { canSpin, status, credits } = get()
     if (!canSpin || status !== Status.Idle) return
+
+    if (!canSpin || status !== Status.Idle || credits <= 0) {
+      if (credits <= 0) set({ status: Status.Ended, canSpin: false })
+      return
+    }
 
     set(
       {
@@ -71,19 +91,17 @@ export const useGameStore = create<GameState & GameActions>((set, get) => ({
       false
     )
 
-    let result: RollResult
+    let result: RollResponse
     try {
       result = await slotGameService.roll()
     } catch (e: any) {
-      set(
-        {
-          error: e.message ?? "Roll failed",
-          status: Status.Idle,
-          canSpin: true,
-          revealed: [true, true, true],
-        },
-        false
-      )
+      const msg = e.message ?? "Roll failed"
+      set({
+        error: msg,
+        status: Status.Idle,
+        canSpin: false,
+        revealed: [true, true, true],
+      })
       return
     }
 
@@ -110,14 +128,12 @@ export const useGameStore = create<GameState & GameActions>((set, get) => ({
     }
 
     const applyId = window.setTimeout(() => {
-      set(
-        (s) => ({
-          credits: result.newCredits,
-          status: s.status === Status.Ended ? Status.Ended : Status.Idle,
-          canSpin: true,
-        }),
-        false
-      )
+      const nextCredits = result.newCredits
+      if (nextCredits <= 0) {
+        set({ credits: 0, status: Status.Ended, canSpin: false })
+      } else {
+        set({ credits: nextCredits, status: Status.Idle, canSpin: true })
+      }
     }, 3000)
     timers.push(applyId)
 
@@ -126,10 +142,17 @@ export const useGameStore = create<GameState & GameActions>((set, get) => ({
 
   async cashout() {
     try {
-      await slotGameService.cashout()
-      set({ status: Status.Ended, canSpin: false }, false)
+      const amount = get().credits
+      const { balance, cashed } = await slotGameService.cashout()
+      get().clearTimers()
+      set({
+        status: Status.Ended,
+        canSpin: false,
+        balance,
+        lastCashoutAmount: cashed ?? amount,
+      })
     } catch (e: any) {
-      set({ error: e.message ?? "Cashout failed" }, false)
+      set({ error: e.message ?? "Cashout failed" })
     }
   },
 

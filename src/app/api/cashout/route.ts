@@ -8,9 +8,9 @@ export async function POST() {
     const sid = readSid()
     if (!sid)
       return NextResponse.json({ message: "No session" }, { status: 400 })
-    const { balance } = await cashout(sid)
+    const { balance, cashed } = await cashout(sid)
     return NextResponse.json(
-      { balance },
+      { balance, cashed },
       { headers: { "Cache-Control": "no-store" } }
     )
   } catch (e) {
