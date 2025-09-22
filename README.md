@@ -1,9 +1,8 @@
 # Casino Jackpot — Full-Stack Slot Machine (Next.js + Prisma)
 
-A minimal, production-ish implementation of the “Casino Jackpot” assignment.
+A minimal implementation of the “Casino Jackpot” assignment.
 Single repo, single Next.js app (App Router), shared types, server-authoritative game logic, and a tiny, testable domain layer.
 
----
 
 ## ✨ Features
 
@@ -18,15 +17,12 @@ Single repo, single Next.js app (App Router), shared types, server-authoritative
 * **Server authority**: sessions/credits live on the server; client is dumb UI.
 * **Monorepo-style organization** with shared types/constants.
 
----
 
 ## 🧱 Tech Stack
 
 * **Frontend**: Next.js (App Router), React, Tailwind, **Zustand** (store)
 * **Backend**: Next.js Route Handlers (Node runtime), Prisma
 * **Tests**: Vitest, Testing Library (unit + store + routes)
-
----
 
 
 ## ⚙️ Setup
@@ -38,11 +34,10 @@ npm i
 ```
 
 2. **Env**
-   Create `.env.local` from `.env.example` and set DB connection:
+   Create `.env` from `.env.example` and set DB connection:
 
 ```bash
-cp .env.example .env.local
-# edit DATABASE_URL, optionally NEXT_PUBLIC_API_BASE_URL=/api
+cp .env.example .env
 ```
 
 3. **DB & Prisma**
@@ -60,7 +55,6 @@ npm run dev
 
 App: [http://localhost:3000](http://localhost:3000)
 
----
 
 ## 🔌 API Endpoints
 
@@ -70,15 +64,11 @@ App: [http://localhost:3000](http://localhost:3000)
 
 > All responses set `Cache-Control: no-store`. Routes run on **Node runtime** (Prisma support).
 
----
 
 ## 🧪 Testing
 
-Install dev deps (already in package.json) and run:
+Run:
 
 ```bash
 npm test           # vitest run
-npm run test:watch # vitest watch
 ```
-
----
