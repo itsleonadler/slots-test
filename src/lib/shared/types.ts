@@ -5,15 +5,21 @@ export enum SymbolKey {
   W = "W",
 }
 
-export interface RollResult {
+export interface RollResponse {
   symbols: SymbolKey[]
   delta: number
   newCredits: number
 }
 
-export interface SessionPayload {
+export interface SessionResponse {
   credits: number
   sessionId: string
+  accountBalance: number
+}
+
+export interface CashoutResponse {
+  balance: number
+  cashed: number
 }
 
 export type SymbolsTriple = [SymbolKey, SymbolKey, SymbolKey]
