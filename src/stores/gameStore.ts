@@ -74,8 +74,6 @@ export const useGameStore = create<GameState & GameActions>((set, get) => ({
 
   async spin() {
     const { canSpin, status, credits } = get()
-    if (!canSpin || status !== Status.Idle) return
-
     if (!canSpin || status !== Status.Idle || credits <= 0) {
       if (credits <= 0) set({ status: Status.Ended, canSpin: false })
       return
