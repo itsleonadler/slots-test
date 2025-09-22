@@ -1,6 +1,6 @@
 'use client';
 import SlotReel from './SlotReel';
-import { SymbolKey } from '@/types/game';
+import { SymbolKey } from '@/lib/shared/types';
 
 export default function SlotMachine({
   reels,

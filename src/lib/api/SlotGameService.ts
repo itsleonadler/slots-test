@@ -1,6 +1,6 @@
 "use client"
 import BaseApiService from "./BaseApiService"
-import type { RollResult, SessionPayload } from "@/types/game"
+import type { RollResult, SessionPayload } from "@/lib/shared/types"
 
 class SlotGameService extends BaseApiService {
   createSession() {
