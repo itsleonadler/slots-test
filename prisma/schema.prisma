@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = env("DATABASE_PROVIDER") // "postgresql" | "mysql"
-  url      = env("DATABASE_URL")
+  provider = "mysql"
+  url      = env("DB_URL")
 }
 
 model User {
@@ -22,15 +22,4 @@ model Session {
   active     Boolean   @default(true)
   createdAt  DateTime  @default(now())
   closedAt   DateTime?
-  rolls      Roll[]
-}
-
-model Roll {
-  id           String   @id @default(cuid())
-  sessionId    String
-  session      Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  symbols      String   
-  win          Boolean
-  deltaCredits Int
-  createdAt    DateTime @default(now())
 }
